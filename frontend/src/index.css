@@ -1,0 +1,301 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --fond: #F4F6FB;
+  --surface: #FFFFFF;
+  --texte: #16213E;
+  --texte-secondaire: #6B7280;
+  --bordure: #E4E8F0;
+
+  /* Bleu principal (remplace le teal) */
+  --primaire: #2F6FED;
+  --primaire-hover: #2557C7;
+  --primaire-clair: #E8F0FE;
+
+  /* Sidebar bleu marine foncé */
+  --sidebar-fond: #101B3D;
+  --sidebar-fond-hover: #1B2A57;
+  --sidebar-texte: #C4CCE0;
+  --sidebar-texte-actif: #FFFFFF;
+  --sidebar-actif-fond: #2F6FED;
+
+  --bleu: #2F6FA3;
+  --bleu-clair: #E7EFF6;
+  --vert: #22A06B;
+  --vert-clair: #E3F7ED;
+  --violet: #8B5CF6;
+  --violet-clair: #F1ECFE;
+  --orange: #D98A2B;
+  --orange-clair: #FBF0DF;
+  --rouge: #E24C4C;
+  --rouge-clair: #FCE8E8;
+
+  --rayon: 10px;
+  --rayon-lg: 16px;
+  --ombre: 0 4px 14px rgba(16, 27, 61, 0.06);
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  background: var(--fond);
+  color: var(--texte);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--primaire);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* ---------- Formulaires ---------- */
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--texte-secondaire);
+  margin-top: 14px;
+  margin-bottom: 6px;
+}
+
+input, select, textarea {
+  width: 100%;
+  font: inherit;
+  font-size: 14px;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  color: var(--texte);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--primaire);
+  box-shadow: 0 0 0 3px var(--primaire-clair);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 70px;
+}
+
+/* ---------- Boutons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s;
+  white-space: nowrap;
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn-primary {
+  background: var(--primaire);
+  color: white;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--primaire-hover);
+}
+.btn-outline {
+  background: var(--surface);
+  border-color: var(--bordure);
+  color: var(--texte);
+}
+.btn-outline:hover:not(:disabled) {
+  border-color: var(--primaire);
+  color: var(--primaire);
+}
+.btn-danger {
+  background: var(--rouge-clair);
+  color: var(--rouge);
+}
+.btn-danger:hover:not(:disabled) {
+  background: var(--rouge);
+  color: white;
+}
+.btn-full {
+  width: 100%;
+  margin-top: 16px;
+}
+
+/* ---------- Mise en page ---------- */
+.page {
+  padding: 28px 32px 48px;
+  max-width: 1100px;
+}
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.page-subtitle {
+  font-size: 13px;
+  color: var(--texte-secondaire);
+  margin-bottom: 22px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon-lg);
+  padding: 18px 20px;
+  box-shadow: var(--ombre);
+}
+
+/* ---------- Formulaires centrés dans la zone de contenu ---------- */
+.page-centree {
+  margin-left: auto;
+  margin-right: auto;
+}
+.carte-formulaire {
+  width: 100%;
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ---------- Badges de statut ---------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.badge-attente { background: var(--orange-clair); color: var(--orange); }
+.badge-confirme { background: var(--vert-clair); color: var(--vert); }
+.badge-annule { background: var(--rouge-clair); color: var(--rouge); }
+.badge-termine { background: var(--bordure); color: var(--texte-secondaire); }
+
+/* ---------- Tableaux ---------- */
+.responsive-table-wrapper {
+  overflow-x: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+thead th {
+  text-align: left;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--texte-secondaire);
+  font-weight: 600;
+  padding: 0 10px 10px;
+  border-bottom: 1px solid var(--bordure);
+  white-space: nowrap;
+}
+tbody td {
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--bordure);
+  vertical-align: middle;
+}
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ---------- États ---------- */
+.etat-vide, .etat-chargement, .etat-erreur {
+  padding: 32px 0;
+  text-align: center;
+  color: var(--texte-secondaire);
+  font-size: 14px;
+}
+.etat-erreur {
+  color: var(--rouge);
+}
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-radius: var(--rayon-lg);
+  padding: 18px 20px;
+  border: none;
+}
+.stat-card-icone {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.stat-bleu   { background: var(--bleu-clair); }
+.stat-vert   { background: var(--vert-clair); }
+.stat-violet { background: var(--violet-clair); }
+.stat-rouge  { background: var(--rouge-clair); }
+
+.stat-bleu .stat-card-icone   { background: var(--bleu);   color: white; }
+.stat-vert .stat-card-icone   { background: var(--vert);   color: white; }
+.stat-violet .stat-card-icone { background: var(--violet); color: white; }
+.stat-rouge .stat-card-icone  { background: var(--rouge);  color: white; }
+.avatar-rond {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  color: white;
+  background: var(--primaire);
+  margin-right: 8px;
+}
+
+.action-icone {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  margin-right: 4px;
+}
+.action-icone.modifier { background: var(--bleu-clair); color: var(--bleu); }
+.action-icone.supprimer { background: var(--rouge-clair); color: var(--rouge); }
+.action-icone:hover { opacity: 0.8; }
