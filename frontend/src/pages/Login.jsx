@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import api from "../api/axios";
 
 const REDIRECTION_PAR_ROLE = {
   PATIENT: "/medecins",
@@ -63,13 +64,21 @@ function IconeOeil({ ouvert }) {
   );
 }
 
+const FORM_MDP_VIDE = { username: "", email: "", password: "", confirmation: "" };
+
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [afficherMdp, setAfficherMdp] = useState(false);
   const [erreur, setErreur] = useState("");
   const [envoi, setEnvoi] = useState(false);
-  const [aideMdp, setAideMdp] = useState(false);
+
+  const [fenetreMdp, setFenetreMdp] = useState(false);
+  const [formMdp, setFormMdp] = useState(FORM_MDP_VIDE);
+  const [erreurMdp, setErreurMdp] = useState("");
+  const [succesMdp, setSuccesMdp] = useState("");
+  const [envoiMdp, setEnvoiMdp] = useState(false);
+
   const { user, login } = useAuth();
   const navigate = useNavigate();
 
@@ -91,6 +100,39 @@ function Login() {
       }
     } finally {
       setEnvoi(false);
+    }
+  };
+
+  const reinitialiserMdp = async (e) => {
+    e.preventDefault();
+    setErreurMdp("");
+    if (formMdp.password !== formMdp.confirmation) {
+      setErreurMdp("Les deux mots de passe ne sont pas identiques.");
+      return;
+    }
+    setEnvoiMdp(true);
+    try {
+      await api.post("comptes/reinitialiser-mot-de-passe/", {
+        username: formMdp.username,
+        email: formMdp.email,
+        password: formMdp.password,
+      });
+      setFenetreMdp(false);
+      setFormMdp(FORM_MDP_VIDE);
+      setSuccesMdp("Mot de passe modifié. Tu peux maintenant te connecter.");
+    } catch (err) {
+      if (err.response?.status === 429) {
+        setErreurMdp("Trop de tentatives. Réessaie dans une heure.");
+      } else {
+        const mdp = err.response?.data?.password;
+        setErreurMdp(
+          Array.isArray(mdp)
+            ? mdp.join(" ")
+            : err.response?.data?.detail || "Impossible de modifier le mot de passe."
+        );
+      }
+    } finally {
+      setEnvoiMdp(false);
     }
   };
 
@@ -120,6 +162,7 @@ function Login() {
         <p className="auth-glass-soustitre">Accède à ton espace patient, médecin ou admin.</p>
 
         {erreur && <p className="auth-erreur">{erreur}</p>}
+        {succesMdp && <p className="auth-succes">{succesMdp}</p>}
 
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: "18px", textAlign: "left" }}>
@@ -171,16 +214,13 @@ function Login() {
             className="auth-glass-lien"
             onClick={(e) => {
               e.preventDefault();
-              setAideMdp(!aideMdp);
+              setErreurMdp("");
+              setSuccesMdp("");
+              setFenetreMdp(true);
             }}
           >
             Mot de passe oublié ?
           </a>
-          {aideMdp && (
-            <p style={{ color: "rgba(255,255,255,0.8)", fontSize: "13px", margin: "10px 0", textAlign: "left" }}>
-              Contacte l'administrateur du site : il pourra te définir un nouveau mot de passe.
-            </p>
-          )}
 
           <button type="submit" className="btn btn-primary btn-full" disabled={envoi}>
             {envoi ? "Connexion..." : "Se connecter"}
@@ -191,6 +231,62 @@ function Login() {
           Pas encore de compte ? <Link to="/inscription">Créer un compte</Link>
         </p>
       </div>
+
+      {fenetreMdp && (
+        <div
+          style={{
+            position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            padding: "16px", zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              background: "#10244f", border: "1px solid rgba(255,255,255,0.15)",
+              borderRadius: "14px", padding: "24px", width: "100%", maxWidth: "400px",
+              maxHeight: "90vh", overflowY: "auto", color: "#fff",
+            }}
+          >
+            <h2 style={{ marginBottom: "6px", fontSize: "20px" }}>Mot de passe oublié</h2>
+            <p style={{ color: "rgba(255,255,255,0.7)", fontSize: "13px", marginBottom: "16px" }}>
+              Renseigne les informations de ton compte, puis choisis un nouveau mot de passe.
+            </p>
+
+            {erreurMdp && <p className="auth-erreur">{erreurMdp}</p>}
+
+            <form onSubmit={reinitialiserMdp}>
+              {[
+                ["username", "Nom d'utilisateur", "text"],
+                ["email", "Email du compte", "email"],
+                ["password", "Nouveau mot de passe", "password"],
+                ["confirmation", "Confirmer le mot de passe", "password"],
+              ].map(([cle, libelle, type]) => (
+                <div key={cle} style={{ marginBottom: "14px", textAlign: "left" }}>
+                  <label style={styleLabel}>{libelle}</label>
+                  <div style={styleLigneChamp}>
+                    <input
+                      type={type}
+                      value={formMdp[cle]}
+                      onChange={(e) => setFormMdp({ ...formMdp, [cle]: e.target.value })}
+                      required
+                      style={styleInput}
+                    />
+                  </div>
+                </div>
+              ))}
+
+              <div style={{ display: "flex", gap: "8px", marginTop: "18px" }}>
+                <button type="submit" className="btn btn-primary" disabled={envoiMdp} style={{ flex: 1 }}>
+                  {envoiMdp ? "Enregistrement..." : "Enregistrer"}
+                </button>
+                <button type="button" className="btn btn-outline" onClick={() => setFenetreMdp(false)}>
+                  Annuler
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
