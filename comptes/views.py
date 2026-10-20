@@ -1,5 +1,4 @@
 from rest_framework import generics, permissions, viewsets
-from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
 from rest_framework.views import APIView
@@ -96,15 +95,3 @@ class UtilisateurViewSet(viewsets.ModelViewSet):
         if role:
             queryset = queryset.filter(role=role)
         return queryset
-
-    @action(detail=True, methods=['post'], url_path='reinitialiser-mot-de-passe')
-    def reinitialiser_mot_de_passe(self, request, pk=None):
-        utilisateur = self.get_object()
-        nouveau = request.data.get('password', '')
-        try:
-            validate_password(nouveau, utilisateur)
-        except DjangoValidationError as e:
-            return Response({'password': list(e.messages)}, status=400)
-        utilisateur.set_password(nouveau)
-        utilisateur.save()
-        return Response({'detail': 'Mot de passe réinitialisé.'})

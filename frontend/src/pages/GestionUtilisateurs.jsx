@@ -41,10 +41,6 @@ function GestionUtilisateurs() {
   const [creation, setCreation] = useState(false);
   const [afficherMdp, setAfficherMdp] = useState(false);
   const [erreurCreation, setErreurCreation] = useState("");
-  const [cibleMdp, setCibleMdp] = useState(null);
-  const [nouveauMdp, setNouveauMdp] = useState("");
-  const [erreurMdp, setErreurMdp] = useState("");
-  const [succesMdp, setSuccesMdp] = useState("");
   const [formCreation, setFormCreation] = useState({
     username: "", email: "", password: "", first_name: "", last_name: "", telephone: "", role: "PATIENT",
   });
@@ -76,29 +72,6 @@ function GestionUtilisateurs() {
     }
   };
 
-    const ouvrirMdp = (u) => {
-    setCibleMdp(u);
-    setNouveauMdp("");
-    setErreurMdp("");
-    setSuccesMdp("");
-  };
-
-  const reinitialiserMdp = async (e) => {
-    e.preventDefault();
-    setErreurMdp("");
-    try {
-      await api.post(`comptes/utilisateurs/${cibleMdp.id}/reinitialiser-mot-de-passe/`, {
-        password: nouveauMdp,
-      });
-      setSuccesMdp(`Mot de passe de "${cibleMdp.username}" réinitialisé.`);
-      setCibleMdp(null);
-      setNouveauMdp("");
-    } catch (err) {
-      const messages = err.response?.data?.password;
-      setErreurMdp(Array.isArray(messages) ? messages.join(" ") : "Impossible de réinitialiser ce mot de passe.");
-    }
-  };
-
   const creerUtilisateur = async (e) => {
     e.preventDefault();
     setErreurCreation("");
@@ -124,31 +97,6 @@ function GestionUtilisateurs() {
           {creation ? "Fermer" : "+ Ajouter un utilisateur"}
         </button>
       </div>
-
-      {succesMdp && <p className="auth-succes">{succesMdp}</p>}
-
-      {cibleMdp && (
-        <div className="card" style={{ marginBottom: "16px" }}>
-          <p style={{ fontWeight: 500, marginBottom: "12px" }}>
-            Nouveau mot de passe pour « {cibleMdp.username} »
-          </p>
-          {erreurMdp && <p className="auth-erreur">{erreurMdp}</p>}
-          <form onSubmit={reinitialiserMdp}>
-            <label>Nouveau mot de passe</label>
-            <input
-              type="text"
-              value={nouveauMdp}
-              onChange={(e) => setNouveauMdp(e.target.value)}
-              required
-              minLength={8}
-            />
-            <div style={{ display: "flex", gap: "8px" }}>
-              <button type="submit" className="btn btn-primary">Enregistrer</button>
-              <button type="button" className="btn btn-outline" onClick={() => setCibleMdp(null)}>Annuler</button>
-            </div>
-          </form>
-        </div>
-      )}
 
       {creation && (
         <div className="card" style={{ marginBottom: "16px" }}>
@@ -234,8 +182,7 @@ function GestionUtilisateurs() {
                         {u.is_active ? "Actif" : "Désactivé"}
                       </button>
                     </td>
-                    <td style={{ display: "flex", gap: "8px" }}>
-                      <button className="btn btn-outline" onClick={() => ouvrirMdp(u)}>Mot de passe</button>
+                    <td>
                       <button className="btn btn-danger" onClick={() => supprimer(u.id, u.username)}>Supprimer</button>
                     </td>
                   </tr>
