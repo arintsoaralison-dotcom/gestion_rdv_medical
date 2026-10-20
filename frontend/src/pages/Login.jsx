@@ -75,6 +75,7 @@ function Login() {
 
   const [fenetreMdp, setFenetreMdp] = useState(false);
   const [formMdp, setFormMdp] = useState(FORM_MDP_VIDE);
+  const [afficherNouveauMdp, setAfficherNouveauMdp] = useState(false);
   const [erreurMdp, setErreurMdp] = useState("");
   const [succesMdp, setSuccesMdp] = useState("");
   const [envoiMdp, setEnvoiMdp] = useState(false);
@@ -119,6 +120,7 @@ function Login() {
       });
       setFenetreMdp(false);
       setFormMdp(FORM_MDP_VIDE);
+      setAfficherNouveauMdp(false);
       setSuccesMdp("Mot de passe modifié. Tu peux maintenant te connecter.");
     } catch (err) {
       if (err.response?.status === 429) {
@@ -216,6 +218,7 @@ function Login() {
               e.preventDefault();
               setErreurMdp("");
               setSuccesMdp("");
+              setAfficherNouveauMdp(false);
               setFenetreMdp(true);
             }}
           >
@@ -260,20 +263,34 @@ function Login() {
                 ["email", "Email du compte", "email"],
                 ["password", "Nouveau mot de passe", "password"],
                 ["confirmation", "Confirmer le mot de passe", "password"],
-              ].map(([cle, libelle, type]) => (
-                <div key={cle} style={{ marginBottom: "14px", textAlign: "left" }}>
-                  <label style={styleLabel}>{libelle}</label>
-                  <div style={styleLigneChamp}>
-                    <input
-                      type={type}
-                      value={formMdp[cle]}
-                      onChange={(e) => setFormMdp({ ...formMdp, [cle]: e.target.value })}
-                      required
-                      style={styleInput}
-                    />
+              ].map(([cle, libelle, type]) => {
+                const estMdp = type === "password";
+                return (
+                  <div key={cle} style={{ marginBottom: "14px", textAlign: "left" }}>
+                    <label style={styleLabel}>{libelle}</label>
+                    <div style={styleLigneChamp}>
+                      <input
+                        type={estMdp && afficherNouveauMdp ? "text" : type}
+                        value={formMdp[cle]}
+                        onChange={(e) => setFormMdp({ ...formMdp, [cle]: e.target.value })}
+                        required
+                        autoComplete={estMdp ? "new-password" : "off"}
+                        style={styleInput}
+                      />
+                      {estMdp && (
+                        <button
+                          type="button"
+                          onClick={() => setAfficherNouveauMdp(!afficherNouveauMdp)}
+                          tabIndex={-1}
+                          style={styleBoutonOeil}
+                        >
+                          <IconeOeil ouvert={afficherNouveauMdp} />
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
 
               <div style={{ display: "flex", gap: "8px", marginTop: "18px" }}>
                 <button type="submit" className="btn btn-primary" disabled={envoiMdp} style={{ flex: 1 }}>
