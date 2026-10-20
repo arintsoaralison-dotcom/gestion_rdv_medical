@@ -69,6 +69,7 @@ function Login() {
   const [afficherMdp, setAfficherMdp] = useState(false);
   const [erreur, setErreur] = useState("");
   const [envoi, setEnvoi] = useState(false);
+  const [aideMdp, setAideMdp] = useState(false);
   const { user, login } = useAuth();
   const navigate = useNavigate();
 
@@ -165,9 +166,21 @@ function Login() {
             </div>
           </div>
 
-          <a href="#" className="auth-glass-lien" onClick={(e) => e.preventDefault()}>
+          <a
+            href="#"
+            className="auth-glass-lien"
+            onClick={(e) => {
+              e.preventDefault();
+              setAideMdp(!aideMdp);
+            }}
+          >
             Mot de passe oublié ?
           </a>
+          {aideMdp && (
+            <p style={{ color: "rgba(255,255,255,0.8)", fontSize: "13px", margin: "10px 0", textAlign: "left" }}>
+              Contacte l'administrateur du site : il pourra te définir un nouveau mot de passe.
+            </p>
+          )}
 
           <button type="submit" className="btn btn-primary btn-full" disabled={envoi}>
             {envoi ? "Connexion..." : "Se connecter"}
