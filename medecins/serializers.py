@@ -12,6 +12,7 @@ class DisponibiliteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Disponibilite
         fields = '__all__'
+        extra_kwargs = {'medecin': {'required': False}}
 
 
 class MedecinSerializer(serializers.ModelSerializer):

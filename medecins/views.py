@@ -1,4 +1,5 @@
 from rest_framework import viewsets, permissions
+from rest_framework.exceptions import ValidationError
 from django.db.models import Q
 from .models import Medecin, Specialite, Disponibilite
 from .serializers import MedecinSerializer, SpecialiteSerializer, DisponibiliteSerializer
@@ -66,6 +67,15 @@ class DisponibiliteViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         user = self.request.user
         if user.role == 'MEDECIN':
-            serializer.save(medecin=user.medecin)
+            try:
+                medecin = user.medecin
+            except Medecin.DoesNotExist:
+                raise ValidationError(
+                    "Aucune fiche médecin n'est liée à ton compte. "
+                    "Demande à un administrateur de la créer."
+                )
+            serializer.save(medecin=medecin)
         else:
+            if not serializer.validated_data.get('medecin'):
+                raise ValidationError({'medecin': 'Ce champ est obligatoire.'})
             serializer.save()
