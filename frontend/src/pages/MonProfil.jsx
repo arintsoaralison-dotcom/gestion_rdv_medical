@@ -15,6 +15,7 @@ function MonProfil() {
   const [chargement, setChargement] = useState(true);
   const [envoi, setEnvoi] = useState(false);
   const [message, setMessage] = useState(null);
+  const [dateVerrouillee, setDateVerrouillee] = useState(false);
 
   useEffect(() => {
     const requetes = [api.get("comptes/mon-profil/")];
@@ -38,6 +39,7 @@ function MonProfil() {
       if (user.role === "PATIENT" && resProfil?.data?.[0]) {
         const p = resProfil.data[0];
         setProfilId(p.id);
+        setDateVerrouillee(Boolean(p.date_naissance));
         setForm({ ...base, date_naissance: p.date_naissance || "", adresse: p.adresse || "", specialite: "", tarif_consultation: "", bio: "" });
       } else if (user.role === "MEDECIN" && resProfil?.data) {
         const m = resProfil.data.find((d) => d.utilisateur === user.id);
@@ -67,10 +69,14 @@ function MonProfil() {
       });
 
       if (user.role === "PATIENT" && profilId) {
-        await api.patch(`patients/${profilId}/`, {
-          date_naissance: form.date_naissance || null,
-          adresse: form.adresse,
-        });
+        const donneesPatient = { adresse: form.adresse };
+        if (!dateVerrouillee) {
+          donneesPatient.date_naissance = form.date_naissance || null;
+        }
+        const res = await api.patch(`patients/${profilId}/`, donneesPatient);
+        if (res.data?.date_naissance) {
+          setDateVerrouillee(true);
+        }
       }
 
       if (user.role === "MEDECIN" && profilId) {
@@ -130,7 +136,14 @@ function MonProfil() {
           {user.role === "PATIENT" && (
             <>
               <label htmlFor="date_naissance">Date de naissance</label>
-              <input id="date_naissance" type="date" value={form.date_naissance} onChange={majChamp("date_naissance")} />
+              <input
+                id="date_naissance"
+                type="date"
+                value={form.date_naissance}
+                onChange={majChamp("date_naissance")}
+                disabled={dateVerrouillee}
+                style={dateVerrouillee ? { opacity: 0.6 } : undefined}
+              />
 
               <label htmlFor="adresse">Adresse</label>
               <input id="adresse" value={form.adresse} onChange={majChamp("adresse")} />

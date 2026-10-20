@@ -11,3 +11,16 @@ class PatientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Patient
         fields = ['id', 'utilisateur', 'nom', 'prenom', 'username', 'email', 'date_naissance', 'adresse']
+
+    def validate_date_naissance(self, valeur):
+        """Une date de naissance déjà enregistrée ne peut être changée que par un administrateur."""
+        request = self.context.get('request')
+        if (
+            self.instance is not None
+            and request is not None
+            and request.user.role != 'ADMIN'
+            and self.instance.date_naissance
+            and valeur != self.instance.date_naissance
+        ):
+            raise serializers.ValidationError("La date de naissance ne peut pas être modifiée.")
+        return valeur
