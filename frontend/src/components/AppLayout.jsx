@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
+import APropos from "./APropos";
 import { useAuth } from "../context/AuthContext";
 import useBloquerRetour from "../hooks/useBloquerRetour";
 
-// Page d'accueil de chaque rôle après connexion
+
 const ACCUEIL_PAR_ROLE = {
   PATIENT: "/medecins",
   MEDECIN: "/dashboard-medecin",
@@ -15,11 +16,11 @@ function AppLayout({ children }) {
   const { user } = useAuth();
   const { pathname } = useLocation();
   const [menuOuvert, setMenuOuvert] = useState(false);
+  const [aProposOuvert, setAProposOuvert] = useState(false);
 
-  // Retour bloqué uniquement sur la page d'accueil du rôle
+
   useBloquerRetour(pathname === ACCUEIL_PAR_ROLE[user?.role]);
 
-  // La touche Échap ferme le menu (utile sur tablette avec clavier)
   useEffect(() => {
     if (!menuOuvert) return;
     const surTouche = (e) => {
@@ -49,8 +50,17 @@ function AppLayout({ children }) {
 
       {menuOuvert && <div className="nav-overlay" onClick={() => setMenuOuvert(false)} />}
 
-      <Sidebar ouvert={menuOuvert} fermer={() => setMenuOuvert(false)} />
+      <Sidebar
+        ouvert={menuOuvert}
+        fermer={() => setMenuOuvert(false)}
+        ouvrirAPropos={() => setAProposOuvert(true)}
+      />
       <div className="app-contenu">{children}</div>
+
+      {/* Fenêtre « À propos » : réservée à l'administrateur */}
+      {user?.role === "ADMIN" && aProposOuvert && (
+        <APropos fermer={() => setAProposOuvert(false)} />
+      )}
     </div>
   );
 }

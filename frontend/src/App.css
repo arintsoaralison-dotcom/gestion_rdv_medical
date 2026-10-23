@@ -694,3 +694,12 @@
   .auth-glass-card { padding: 28px 20px; border-radius: 20px; }
   .auth-carte { padding: 26px 20px; }
 }
+
+.nav-side-lien-bouton {
+  background: none;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+}

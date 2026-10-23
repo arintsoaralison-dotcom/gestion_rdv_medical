@@ -42,6 +42,12 @@ const ICONES = {
       <circle cx="12" cy="7" r="4" />
     </>
   ),
+    info: (
+    <>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 16v-4M12 8h.01" />
+    </>
+  ),
   logout: (
     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
   ),
@@ -91,7 +97,7 @@ const LIBELLE_ROLE = {
   PATIENT: "Patient",
 };
 
-function Sidebar({ ouvert = false, fermer = () => {} }) {
+function Sidebar({ ouvert = false, fermer = () => {}, ouvrirAPropos = () => {} }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -129,6 +135,19 @@ function Sidebar({ ouvert = false, fermer = () => {} }) {
             <span>{item.label}</span>
           </NavLink>
         ))}
+        {user?.role === "ADMIN" && (
+          <button
+            type="button"
+            className="nav-side-lien nav-side-lien-bouton"
+            onClick={() => {
+              ouvrirAPropos();
+              fermer();
+            }}
+          >
+            <Icone nom="info" />
+            <span>À propos</span>
+          </button>
+        )}
       </nav>
 
       <div className="nav-side-bas">
