@@ -160,7 +160,7 @@ function Login() {
           </svg>
         </div>
 
-        <h1>Connexion</h1>
+        <h1>RDV Médical</h1>
         <p className="auth-glass-soustitre">Accède à ton espace patient, médecin ou admin.</p>
 
         {erreur && <p className="auth-erreur">{erreur}</p>}
