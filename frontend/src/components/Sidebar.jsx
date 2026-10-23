@@ -91,7 +91,7 @@ const LIBELLE_ROLE = {
   PATIENT: "Patient",
 };
 
-function Sidebar() {
+function Sidebar({ ouvert = false, fermer = () => {} }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -103,13 +103,16 @@ function Sidebar() {
   };
 
   return (
-    <aside className="nav-side">
+      <aside className={"nav-side" + (ouvert ? " ouvert" : "")}>
       <div className="nav-side-logo">
         <div className="nav-side-badge">RM</div>
         <div>
           <p className="nav-side-titre">RDV Médical</p>
           <p className="nav-side-sous">Gestion des rendez-vous</p>
         </div>
+        <button type="button" className="nav-side-fermer" aria-label="Fermer le menu" onClick={fermer}>
+          ✕
+        </button>
       </div>
 
       <nav className="nav-side-menu">
@@ -117,6 +120,7 @@ function Sidebar() {
           <NavLink
             key={item.to}
             to={item.to}
+            onClick={fermer}
             className={({ isActive }) =>
               "nav-side-lien" + (isActive ? " actif" : "")
             }
