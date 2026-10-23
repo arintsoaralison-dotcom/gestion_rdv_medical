@@ -7,14 +7,26 @@ const STATUT_COULEURS = {
   ANNULE: "var(--rouge)",
   TERMINE: "var(--bleu)",
 };
+const STATUT_FONDS = {
+  EN_ATTENTE: "var(--orange-clair)",
+  CONFIRME: "var(--vert-clair)",
+  ANNULE: "var(--rouge-clair)",
+  TERMINE: "var(--bleu-clair)",
+};
 const STATUT_LABELS = {
   EN_ATTENTE: "En attente",
   CONFIRME: "Confirmé",
   ANNULE: "Annulé",
   TERMINE: "Terminé",
 };
+// Quand plusieurs rendez-vous tombent le même jour, la case prend la couleur du plus important.
+const PRIORITE_STATUTS = ["EN_ATTENTE", "CONFIRME", "TERMINE", "ANNULE"];
+
 const NOMS_MOIS = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
 const NOMS_JOURS = ["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"];
+
+const statutDominant = (rdvs) =>
+  PRIORITE_STATUTS.find((s) => rdvs.some((r) => r.statut === s)) || null;
 
 function CalendrierRendezVous() {
   const [rendezvous, setRendezvous] = useState([]);
@@ -79,33 +91,73 @@ function CalendrierRendezVous() {
               {cases.map((jour, i) => {
                 if (jour === null) return <div key={i} />;
                 const rdvs = rdvParJour(jour);
+                const statut = rdvs.length > 0 ? statutDominant(rdvs) : null;
                 const estAujourdhui = jour === aujourdHui.getDate() && mois === aujourdHui.getMonth() && annee === aujourdHui.getFullYear();
+                const estSelectionne = jourSelectionne === jour;
+
+                let fond = "var(--surface)";
+                if (statut) fond = STATUT_FONDS[statut];
+                else if (estSelectionne) fond = "var(--primaire-clair)";
+
+                let bordure = "1px solid var(--bordure)";
+                if (statut) bordure = `1px solid ${STATUT_COULEURS[statut]}`;
+                if (estAujourdhui) bordure = "2px solid var(--primaire)";
+
                 return (
                   <button
                     key={i}
                     onClick={() => setJourSelectionne(jour)}
+                    title={statut ? `${rdvs.length} rendez-vous (${STATUT_LABELS[statut]})` : undefined}
                     style={{
                       aspectRatio: "1",
-                      border: estAujourdhui ? "2px solid var(--primaire)" : "1px solid var(--bordure)",
+                      border: bordure,
                       borderRadius: "8px",
-                      background: jourSelectionne === jour ? "var(--primaire-clair)" : "var(--surface)",
+                      background: fond,
+                      boxShadow: estSelectionne ? "0 0 0 2px var(--primaire)" : "none",
+                      color: "var(--texte)",
                       cursor: "pointer",
                       padding: "4px",
                       display: "flex",
                       flexDirection: "column",
                       alignItems: "center",
+                      justifyContent: "center",
                       gap: "2px",
                     }}
                   >
-                    <span style={{ fontSize: "12px", fontWeight: 600 }}>{jour}</span>
-                    <div style={{ display: "flex", gap: "2px", flexWrap: "wrap", justifyContent: "center" }}>
-                      {rdvs.slice(0, 4).map((r) => (
-                        <span key={r.id} style={{ width: "5px", height: "5px", borderRadius: "50%", background: STATUT_COULEURS[r.statut] }} />
-                      ))}
-                    </div>
+                    <span
+                      style={{
+                        fontSize: "13px",
+                        fontWeight: statut ? 700 : 600,
+                        color: statut ? STATUT_COULEURS[statut] : "inherit",
+                      }}
+                    >
+                      {jour}
+                    </span>
+                    {statut && (
+                      <span style={{ fontSize: "10px", fontWeight: 600, color: STATUT_COULEURS[statut] }}>
+                        {rdvs.length} RDV
+                      </span>
+                    )}
                   </button>
                 );
               })}
+            </div>
+
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "14px", marginTop: "14px" }}>
+              {PRIORITE_STATUTS.map((s) => (
+                <div key={s} style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "var(--texte-secondaire)" }}>
+                  <span
+                    style={{
+                      width: "14px",
+                      height: "14px",
+                      borderRadius: "4px",
+                      background: STATUT_FONDS[s],
+                      border: `1px solid ${STATUT_COULEURS[s]}`,
+                    }}
+                  />
+                  {STATUT_LABELS[s]}
+                </div>
+              ))}
             </div>
           </>
         )}
