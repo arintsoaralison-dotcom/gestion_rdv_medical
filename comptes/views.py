@@ -8,6 +8,7 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from .models import Utilisateur
 from .serializers import (
     UtilisateurSerializer,
+    InscriptionSerializer,
     UtilisateurGestionSerializer,
     MonProfilSerializer,
     CustomTokenObtainPairSerializer,
@@ -16,13 +17,10 @@ from .permissions import EstAdmin
 
 
 class InscriptionView(generics.CreateAPIView):
-    """Inscription publique : toujours créée avec le rôle PATIENT, quoi qu'on envoie."""
+    """Inscription publique : le rôle choisi ne peut être que PATIENT ou MEDECIN (jamais ADMIN)."""
     queryset = Utilisateur.objects.all()
-    serializer_class = UtilisateurSerializer
+    serializer_class = InscriptionSerializer
     permission_classes = [permissions.AllowAny]
-
-    def perform_create(self, serializer):
-        serializer.save(role=Utilisateur.Role.PATIENT)
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):

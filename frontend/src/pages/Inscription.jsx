@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import api from "../api/axios";
@@ -8,6 +8,11 @@ const REDIRECTION_PAR_ROLE = {
   MEDECIN: "/dashboard-medecin",
   ADMIN: "/dashboard-admin",
 };
+
+const ROLES_INSCRIPTION = [
+  ["PATIENT", "Patient"],
+  ["MEDECIN", "Médecin"],
+];
 
 const styleLigneChamp = {
   display: "flex",
@@ -41,6 +46,14 @@ const styleBoutonOeil = {
   fontSize: "16px",
 };
 
+const messagesErreur = (data) => {
+  if (!data || typeof data !== "object") return "";
+  return Object.values(data)
+    .flat()
+    .filter((m) => typeof m === "string")
+    .join(" ");
+};
+
 function Inscription() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -52,11 +65,19 @@ function Inscription() {
     first_name: "",
     last_name: "",
     telephone: "",
+    role: "PATIENT",
+    specialite: "",
+    numero_licence: "",
   });
+  const [specialites, setSpecialites] = useState([]);
   const [afficherMdp, setAfficherMdp] = useState(false);
   const [erreur, setErreur] = useState("");
   const [succes, setSucces] = useState(false);
   const [envoi, setEnvoi] = useState(false);
+
+  useEffect(() => {
+    api.get("specialites/").then((res) => setSpecialites(res.data)).catch(() => {});
+  }, []);
 
   if (user) {
     return <Navigate to={REDIRECTION_PAR_ROLE[user.role] || "/"} replace />;
@@ -68,11 +89,27 @@ function Inscription() {
     setErreur("");
     setEnvoi(true);
     try {
-      await api.post("comptes/inscription/", form);
+      const donnees = {
+        username: form.username,
+        email: form.email,
+        password: form.password,
+        first_name: form.first_name,
+        last_name: form.last_name,
+        telephone: form.telephone,
+        role: form.role,
+      };
+      if (form.role === "MEDECIN") {
+        donnees.specialite = form.specialite ? Number(form.specialite) : null;
+        donnees.numero_licence = form.numero_licence;
+      }
+      await api.post("comptes/inscription/", donnees);
       setSucces(true);
       setTimeout(() => navigate("/", { replace: true }), 1200);
     } catch (err) {
-      setErreur("Impossible de créer le compte. Vérifie les informations saisies.");
+      setErreur(
+        messagesErreur(err.response?.data) ||
+          "Impossible de créer le compte. Vérifie les informations saisies."
+      );
     } finally {
       setEnvoi(false);
     }
@@ -106,6 +143,21 @@ function Inscription() {
         {succes && <p className="auth-succes">Compte créé avec succès ! Redirection...</p>}
 
         <form onSubmit={handleSubmit}>
+          <label>Je m'inscris en tant que</label>
+          <div style={{ display: "flex", gap: "8px", marginBottom: "14px" }}>
+            {ROLES_INSCRIPTION.map(([valeur, libelle]) => (
+              <button
+                key={valeur}
+                type="button"
+                className={`btn ${form.role === valeur ? "btn-primary" : "btn-outline"}`}
+                style={{ flex: 1 }}
+                onClick={() => setForm((f) => ({ ...f, role: valeur }))}
+              >
+                {libelle}
+              </button>
+            ))}
+          </div>
+
           <div className="champ-ligne">
             <div>
               <label htmlFor="first_name">Prénom</label>
@@ -176,6 +228,27 @@ function Inscription() {
               />
             </div>
           </div>
+
+          {form.role === "MEDECIN" && (
+            <>
+              <label htmlFor="specialite">Spécialité</label>
+              <select id="specialite" value={form.specialite} onChange={majChamp("specialite")} required>
+                <option value="">-- Choisir --</option>
+                {specialites.map((s) => (
+                  <option key={s.id} value={s.id}>{s.nom}</option>
+                ))}
+              </select>
+
+              <label htmlFor="numero_licence">Numéro de licence</label>
+              <input
+                id="numero_licence"
+                value={form.numero_licence}
+                onChange={majChamp("numero_licence")}
+                onKeyDown={gererTouche}
+                required
+              />
+            </>
+          )}
 
           <button type="submit" className="btn btn-primary btn-full" disabled={envoi}>
             {envoi ? "Création..." : "Créer mon compte"}
