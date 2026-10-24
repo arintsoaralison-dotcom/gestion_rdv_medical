@@ -15,6 +15,7 @@ import GestionMedecins from "./pages/GestionMedecins";
 import GestionPatients from "./pages/GestionPatients";
 import GestionUtilisateurs from "./pages/GestionUtilisateurs";
 import Notifications from "./pages/Notifications";
+import APropos from "./pages/APropos";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
@@ -94,6 +95,11 @@ function App() {
         <Route path="/gestion-utilisateurs" element={
           <ProtectedRoute rolesAutorises={["ADMIN"]}>
             <GestionUtilisateurs />
+          </ProtectedRoute>
+        } />
+        <Route path="/a-propos" element={
+          <ProtectedRoute rolesAutorises={["ADMIN"]}>
+            <APropos />
           </ProtectedRoute>
         } />
       </Routes>

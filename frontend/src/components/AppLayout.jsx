@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
-import APropos from "./APropos";
 import { useAuth } from "../context/AuthContext";
 import useBloquerRetour from "../hooks/useBloquerRetour";
 import useNotifications from "../hooks/useNotifications";
@@ -17,7 +16,6 @@ function AppLayout({ children }) {
   const { user } = useAuth();
   const { pathname } = useLocation();
   const [menuOuvert, setMenuOuvert] = useState(false);
-  const [aProposOuvert, setAProposOuvert] = useState(false);
 
   // Notifications : uniquement pour le médecin
   const nonLues = useNotifications(user?.role === "MEDECIN");
@@ -59,15 +57,9 @@ function AppLayout({ children }) {
       <Sidebar
         ouvert={menuOuvert}
         fermer={() => setMenuOuvert(false)}
-        ouvrirAPropos={() => setAProposOuvert(true)}
         nonLues={nonLues}
       />
       <div className="app-contenu">{children}</div>
-
-      {/* Fenêtre « À propos » : réservée à l'administrateur */}
-      {user?.role === "ADMIN" && aProposOuvert && (
-        <APropos fermer={() => setAProposOuvert(false)} />
-      )}
     </div>
   );
 }

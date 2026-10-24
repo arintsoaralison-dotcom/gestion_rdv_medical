@@ -1,5 +1,3 @@
-import { useEffect } from "react";
-
 const COULEURS = {
   compte: { fond: "var(--violet-clair)", trait: "var(--violet)" },
   metier: { fond: "var(--bleu-clair)", trait: "var(--bleu)" },
@@ -72,75 +70,36 @@ const MULTIPLICITES = [
   { t: "0..*", x: 436, y: 468 },
 ];
 
-function APropos({ fermer }) {
-  useEffect(() => {
-    const surTouche = (e) => {
-      if (e.key === "Escape") fermer();
-    };
-    window.addEventListener("keydown", surTouche);
-    const ancienOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      window.removeEventListener("keydown", surTouche);
-      document.body.style.overflow = ancienOverflow;
-    };
-  }, [fermer]);
-
+function APropos() {
   return (
-    <div
-      onClick={fermer}
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(6, 11, 26, 0.6)",
-        zIndex: 100,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "16px",
-      }}
-    >
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="apropos-titre"
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          background: "var(--surface)",
-          borderRadius: "var(--rayon-lg)",
-          width: "100%",
-          maxWidth: "760px",
-          maxHeight: "90vh",
-          overflowY: "auto",
-          padding: "22px",
-        }}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
-          <h2 id="apropos-titre" style={{ fontSize: "20px" }}>À propos</h2>
-          <button type="button" className="btn btn-outline" onClick={fermer} aria-label="Fermer">
-            ✕
-          </button>
-        </div>
+    <div className="page">
+      <div className="page-entete-fixe">
+        <p className="page-title">À propos</p>
+        <p className="page-subtitle">Présentation de l'application et de sa base de données.</p>
+      </div>
 
+      <div className="card" style={{ marginBottom: "20px" }}>
         <p style={{ fontWeight: 700, marginBottom: "4px" }}>RDV Médical</p>
         <p style={{ fontSize: "14px", color: "var(--texte-secondaire)", marginBottom: "6px" }}>
           Application web de gestion de rendez-vous médicaux, avec trois profils : patient, médecin et administrateur.
         </p>
-        <p style={{ fontSize: "14px", color: "var(--texte-secondaire)", marginBottom: "20px" }}>
+        <p style={{ fontSize: "14px", color: "var(--texte-secondaire)" }}>
           Technologies : Django et Django REST Framework pour l'API, React avec Vite pour l'interface, hébergement sur Render.
         </p>
+      </div>
 
+      <div className="card">
         <p style={{ fontWeight: 700, marginBottom: "4px" }}>Modèle physique de données (MPD)</p>
-        <p style={{ fontSize: "13px", color: "var(--texte-secondaire)", marginBottom: "12px" }}>
+        <p style={{ fontSize: "13px", color: "var(--texte-secondaire)", marginBottom: "14px" }}>
           Six tables reliées par des clés étrangères. Chaque multiplicité est écrite à côté de la table qu'elle décrit.
         </p>
 
-        <div style={{ overflowX: "auto", border: "1px solid var(--bordure)", borderRadius: "var(--rayon)", padding: "8px" }}>
+        <div style={{ overflowX: "auto" }}>
           <svg
             viewBox="0 0 680 596"
             role="img"
             aria-label="Modèle physique de données : six tables reliées par des clés étrangères"
-            style={{ width: "100%", minWidth: "640px", height: "auto", display: "block" }}
+            style={{ width: "100%", minWidth: "640px", maxWidth: "900px", height: "auto", display: "block", margin: "0 auto" }}
           >
             {LIAISONS.map((d) => (
               <path key={d} d={d} fill="none" stroke="var(--texte-secondaire)" strokeWidth="1.2" />

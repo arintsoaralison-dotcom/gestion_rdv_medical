@@ -84,6 +84,7 @@ const MENUS = {
     { to: "/gestion-patients", label: "Patients", icone: "patients" },
     { to: "/gestion-utilisateurs", label: "Utilisateurs", icone: "utilisateurs" },
     { to: "/mon-profil", label: "Mon profil", icone: "profil" },
+    { to: "/a-propos", label: "À propos", icone: "info" },
   ],
   MEDECIN: [
     { to: "/dashboard-medecin", label: "Tableau de bord", icone: "dashboard" },
@@ -104,7 +105,7 @@ const LIBELLE_ROLE = {
   PATIENT: "Patient",
 };
 
-function Sidebar({ ouvert = false, fermer = () => {}, ouvrirAPropos = () => {}, nonLues = 0 }) {
+function Sidebar({ ouvert = false, fermer = () => {}, nonLues = 0 }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -145,19 +146,6 @@ function Sidebar({ ouvert = false, fermer = () => {}, ouvrirAPropos = () => {}, 
             )}
           </NavLink>
         ))}
-        {user?.role === "ADMIN" && (
-          <button
-            type="button"
-            className="nav-side-lien nav-side-lien-bouton"
-            onClick={() => {
-              ouvrirAPropos();
-              fermer();
-            }}
-          >
-            <Icone nom="info" />
-            <span>À propos</span>
-          </button>
-        )}
       </nav>
 
       <div className="nav-side-bas">
