@@ -95,6 +95,7 @@ const MENUS = {
   PATIENT: [
     { to: "/medecins", label: "Médecins", icone: "medecins" },
     { to: "/mes-rendezvous", label: "Mes rendez-vous", icone: "rdv" },
+    { to: "/notifications", label: "Notifications", icone: "cloche", badge: true },
     { to: "/mon-profil", label: "Mon profil", icone: "profil" },
   ],
 };

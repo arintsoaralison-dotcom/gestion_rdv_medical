@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
+import { useAuth } from "../context/AuthContext";
 
-const ICONES = { NOUVELLE_DEMANDE: "🆕", RAPPEL: "⏰" };
+const ICONES = { NOUVELLE_DEMANDE: "🆕", RAPPEL: "⏰", CONFIRMATION: "✅" };
 
 const formaterDate = (iso) =>
   new Date(iso).toLocaleString("fr-FR", {
@@ -14,9 +15,13 @@ const formaterDate = (iso) =>
 
 function Notifications() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [notifications, setNotifications] = useState([]);
   const [nonLues, setNonLues] = useState(0);
   const [chargement, setChargement] = useState(true);
+
+  // Page vers laquelle mène un clic sur une notification
+  const destination = user.role === "PATIENT" ? "/mes-rendezvous" : "/dashboard-medecin";
 
   const charger = useCallback(() => {
     api
@@ -46,7 +51,7 @@ function Notifications() {
       await api.post(`notifications/${n.id}/lire/`);
       prevenirMenu();
     }
-    navigate("/dashboard-medecin");
+    navigate(destination);
   };
 
   return (

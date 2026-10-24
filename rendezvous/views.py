@@ -15,6 +15,11 @@ def nom_patient(rdv):
     return utilisateur.get_full_name() or utilisateur.username
 
 
+def nom_medecin(rdv):
+    utilisateur = rdv.medecin.utilisateur
+    return utilisateur.get_full_name() or utilisateur.username
+
+
 def est_depasse(rdv):
     """Vrai si la date et l'heure du rendez-vous sont déjà passées."""
     moment = timezone.make_aware(datetime.combine(rdv.date, rdv.heure))
@@ -98,6 +103,7 @@ class RendezVousViewSet(viewsets.ModelViewSet):
 
         ancienne_date = serializer.instance.date
         ancienne_heure = serializer.instance.heure
+        ancien_statut = serializer.instance.statut
         rdv = serializer.save()
 
         # Un rappel n'a de sens que pour un rendez-vous confirmé, à sa date et heure actuelles
@@ -107,6 +113,23 @@ class RendezVousViewSet(viewsets.ModelViewSet):
             or rdv.heure != ancienne_heure
         ):
             Notification.objects.filter(rendezvous=rdv, type=Notification.Type.RAPPEL).delete()
+
+        # Le rendez-vous vient d'être confirmé : on prévient le patient (une seule fois)
+        if (
+            ancien_statut != RendezVous.Statut.CONFIRME
+            and rdv.statut == RendezVous.Statut.CONFIRME
+        ):
+            Notification.objects.get_or_create(
+                rendezvous=rdv,
+                type=Notification.Type.CONFIRMATION,
+                defaults={
+                    'utilisateur': rdv.patient.utilisateur,
+                    'message': (
+                        f"Votre rendez-vous du {rdv.date:%d/%m/%Y} à {rdv.heure:%H:%M} "
+                        f"avec Dr {nom_medecin(rdv)} a été confirmé."
+                    ),
+                },
+            )
 
     def perform_destroy(self, instance):
         self.verifier_demande_expiree(instance)

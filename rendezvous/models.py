@@ -30,6 +30,7 @@ class Notification(models.Model):
     class Type(models.TextChoices):
         NOUVELLE_DEMANDE = 'NOUVELLE_DEMANDE', 'Nouvelle demande'
         RAPPEL = 'RAPPEL', 'Rappel'
+        CONFIRMATION = 'CONFIRMATION', 'Rendez-vous confirmé'
 
     utilisateur = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications'
@@ -43,7 +44,7 @@ class Notification(models.Model):
     class Meta:
         ordering = ['-date_creation']
         constraints = [
-            # Un seul rappel (et une seule demande) par rendez-vous
+            # Une seule notification de chaque type par rendez-vous
             models.UniqueConstraint(
                 fields=['rendezvous', 'type'], name='notification_unique_par_rdv_et_type'
             ),

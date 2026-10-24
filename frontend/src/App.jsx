@@ -66,7 +66,7 @@ function App() {
           </ProtectedRoute>
         } />
         <Route path="/notifications" element={
-          <ProtectedRoute rolesAutorises={["MEDECIN"]}>
+          <ProtectedRoute rolesAutorises={["MEDECIN", "PATIENT"]}>
             <Notifications />
           </ProtectedRoute>
         } />

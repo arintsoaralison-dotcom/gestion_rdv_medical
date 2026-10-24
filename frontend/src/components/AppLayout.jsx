@@ -17,7 +17,7 @@ function AppLayout({ children }) {
   const { pathname } = useLocation();
   const [menuOuvert, setMenuOuvert] = useState(false);
 
-  const nonLues = useNotifications(user?.role === "MEDECIN");
+  const nonLues = useNotifications(["MEDECIN", "PATIENT"].includes(user?.role));
 
   useTableauxMobile();
 
