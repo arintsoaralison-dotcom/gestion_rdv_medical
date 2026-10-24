@@ -44,8 +44,10 @@ function MesRendezVous() {
     try {
       await api.patch(`rendezvous/${id}/`, { statut: "ANNULE" });
       chargerRendezVous();
-    } catch {
-      alert("Impossible d'annuler ce rendez-vous.");
+    } catch (err) {
+      alert(err.response?.data?.detail || "Impossible d'annuler ce rendez-vous.");
+      // Le médecin a peut-être confirmé entre-temps : on rafraîchit la liste
+      chargerRendezVous();
     }
   };
 
@@ -88,8 +90,13 @@ function MesRendezVous() {
                     <td>{rdv.motif || "—"}</td>
                     <td><span className={`badge ${STATUT_CLASSES[rdv.statut]}`}>{STATUT_LABELS[rdv.statut]}</span></td>
                     <td>
-                      {(rdv.statut === "EN_ATTENTE" || rdv.statut === "CONFIRME") && (
+                      {rdv.statut === "EN_ATTENTE" && (
                         <button className="btn btn-danger" onClick={() => annulerRendezVous(rdv.id)}>Annuler</button>
+                      )}
+                      {rdv.statut === "CONFIRME" && (
+                        <span style={{ fontSize: "13px", color: "var(--texte-secondaire)" }}>
+                          Annulation impossible
+                        </span>
                       )}
                     </td>
                   </tr>

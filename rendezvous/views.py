@@ -98,7 +98,11 @@ class RendezVousViewSet(viewsets.ModelViewSet):
 
         if user.role == 'PATIENT' and nouveau_statut and nouveau_statut != 'ANNULE':
             raise PermissionDenied("Un patient ne peut qu'annuler un rendez-vous, pas changer son statut.")
-
+        if user.role == 'PATIENT' and serializer.instance.statut != RendezVous.Statut.EN_ATTENTE:
+            raise PermissionDenied(
+                "Ce rendez-vous a déjà été traité par le médecin : "
+                "tu ne peux plus le modifier ni l'annuler. Contacte directement le médecin."
+            )
         self.verifier_demande_expiree(serializer.instance)
 
         ancienne_date = serializer.instance.date
@@ -132,6 +136,10 @@ class RendezVousViewSet(viewsets.ModelViewSet):
             )
 
     def perform_destroy(self, instance):
+        if self.request.user.role == 'PATIENT' and instance.statut != RendezVous.Statut.EN_ATTENTE:
+            raise PermissionDenied(
+                "Ce rendez-vous a déjà été traité par le médecin : tu ne peux plus le supprimer."
+            )
         self.verifier_demande_expiree(instance)
         instance.delete()
 
