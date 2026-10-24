@@ -176,7 +176,7 @@ function Login() {
               </svg>
               <input
                 id="username"
-                placeholder="jane.doe"
+                placeholder=""
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 onKeyDown={gererTouche}
