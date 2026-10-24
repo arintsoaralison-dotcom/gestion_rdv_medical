@@ -783,3 +783,14 @@
     text-align: left;
   }
 }
+
+
+.auth-glass-page input:-webkit-autofill,
+.auth-glass-page input:-webkit-autofill:hover,
+.auth-glass-page input:-webkit-autofill:focus,
+.auth-glass-page input:-webkit-autofill:active {
+  -webkit-text-fill-color: #fff;
+  caret-color: #fff;
+
+  transition: background-color 9999s ease-in-out 0s;
+}
