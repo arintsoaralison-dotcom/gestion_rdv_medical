@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from django.utils import timezone
 from rest_framework import viewsets, permissions
@@ -13,6 +13,12 @@ from .serializers import RendezVousSerializer, NotificationSerializer
 def nom_patient(rdv):
     utilisateur = rdv.patient.utilisateur
     return utilisateur.get_full_name() or utilisateur.username
+
+
+def est_depasse(rdv):
+    """Vrai si la date et l'heure du rendez-vous sont déjà passées."""
+    moment = timezone.make_aware(datetime.combine(rdv.date, rdv.heure))
+    return moment < timezone.now()
 
 
 def generer_rappels(utilisateur):
@@ -69,12 +75,26 @@ class RendezVousViewSet(viewsets.ModelViewSet):
             ),
         )
 
+    def verifier_demande_expiree(self, rdv):
+        """Un médecin ne peut plus agir sur une demande en attente dont la date est dépassée."""
+        if (
+            self.request.user.role == 'MEDECIN'
+            and rdv.statut == RendezVous.Statut.EN_ATTENTE
+            and est_depasse(rdv)
+        ):
+            raise PermissionDenied(
+                "La date de ce rendez-vous est dépassée : "
+                "il ne peut plus être confirmé, refusé ni modifié."
+            )
+
     def perform_update(self, serializer):
         user = self.request.user
         nouveau_statut = serializer.validated_data.get('statut')
 
         if user.role == 'PATIENT' and nouveau_statut and nouveau_statut != 'ANNULE':
             raise PermissionDenied("Un patient ne peut qu'annuler un rendez-vous, pas changer son statut.")
+
+        self.verifier_demande_expiree(serializer.instance)
 
         ancienne_date = serializer.instance.date
         ancienne_heure = serializer.instance.heure
@@ -87,6 +107,10 @@ class RendezVousViewSet(viewsets.ModelViewSet):
             or rdv.heure != ancienne_heure
         ):
             Notification.objects.filter(rendezvous=rdv, type=Notification.Type.RAPPEL).delete()
+
+    def perform_destroy(self, instance):
+        self.verifier_demande_expiree(instance)
+        instance.delete()
 
 
 class NotificationViewSet(viewsets.GenericViewSet):

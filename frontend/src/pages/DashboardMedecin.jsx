@@ -22,6 +22,12 @@ const STATUT_COULEURS = {
   TERMINE: "var(--bleu)",
 };
 
+// Vrai si la date et l'heure du rendez-vous sont déjà passées
+const estDepasse = (rdv) => new Date(rdv.date + "T" + rdv.heure) < new Date();
+
+// Une demande en attente dont la date est dépassée est « expirée » : plus d'action possible
+const estExpire = (rdv) => rdv.statut === "EN_ATTENTE" && estDepasse(rdv);
+
 function DashboardMedecin() {
   const [rendezvous, setRendezvous] = useState([]);
   const [chargement, setChargement] = useState(true);
@@ -46,8 +52,9 @@ function DashboardMedecin() {
     try {
       await api.patch(`rendezvous/${id}/`, { statut: nouveauStatut });
       chargerRendezVous();
-    } catch {
-      alert("Impossible de mettre à jour ce rendez-vous.");
+    } catch (err) {
+      alert(err.response?.data?.detail || "Impossible de mettre à jour ce rendez-vous.");
+      chargerRendezVous();
     }
   };
 
@@ -125,13 +132,24 @@ function DashboardMedecin() {
                     <td>{rdv.date}</td>
                     <td>{rdv.heure.slice(0, 5)}</td>
                     <td>{rdv.motif || "—"}</td>
-                    <td><span className={`badge ${STATUT_CLASSES[rdv.statut]}`}>{STATUT_LABELS[rdv.statut]}</span></td>
-                    <td style={{ display: "flex", gap: "6px" }}>
-                      {rdv.statut === "EN_ATTENTE" && (
+                    <td>
+                      {estExpire(rdv) ? (
+                        <span className="badge" style={{ background: "var(--bordure)", color: "var(--texte-secondaire)" }}>
+                          Expiré
+                        </span>
+                      ) : (
+                        <span className={`badge ${STATUT_CLASSES[rdv.statut]}`}>{STATUT_LABELS[rdv.statut]}</span>
+                      )}
+                    </td>
+                    <td style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+                      {rdv.statut === "EN_ATTENTE" && !estExpire(rdv) && (
                         <>
                           <button className="btn btn-primary" onClick={() => changerStatut(rdv.id, "CONFIRME")}>Confirmer</button>
                           <button className="btn btn-danger" onClick={() => changerStatut(rdv.id, "ANNULE")}>Refuser</button>
                         </>
+                      )}
+                      {estExpire(rdv) && (
+                        <span style={{ fontSize: "13px", color: "var(--texte-secondaire)" }}>Date dépassée</span>
                       )}
                       {rdv.statut === "CONFIRME" && (
                         <button className="btn btn-outline" onClick={() => changerStatut(rdv.id, "TERMINE")}>Marquer terminé</button>
