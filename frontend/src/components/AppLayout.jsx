@@ -4,8 +4,8 @@ import Sidebar from "./Sidebar";
 import { useAuth } from "../context/AuthContext";
 import useBloquerRetour from "../hooks/useBloquerRetour";
 import useNotifications from "../hooks/useNotifications";
+import useTableauxMobile from "../hooks/useTableauxMobile";
 
-// Page d'accueil de chaque rôle après connexion
 const ACCUEIL_PAR_ROLE = {
   PATIENT: "/medecins",
   MEDECIN: "/dashboard-medecin",
@@ -17,13 +17,12 @@ function AppLayout({ children }) {
   const { pathname } = useLocation();
   const [menuOuvert, setMenuOuvert] = useState(false);
 
-  // Notifications : uniquement pour le médecin
   const nonLues = useNotifications(user?.role === "MEDECIN");
 
-  // Retour bloqué uniquement sur la page d'accueil du rôle
+  useTableauxMobile();
+
   useBloquerRetour(pathname === ACCUEIL_PAR_ROLE[user?.role]);
 
-  // La touche Échap ferme le menu (utile sur tablette avec clavier)
   useEffect(() => {
     if (!menuOuvert) return;
     const surTouche = (e) => {
