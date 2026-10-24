@@ -14,6 +14,7 @@ import CalendrierRendezVous from "./pages/CalendrierRendezVous";
 import GestionMedecins from "./pages/GestionMedecins";
 import GestionPatients from "./pages/GestionPatients";
 import GestionUtilisateurs from "./pages/GestionUtilisateurs";
+import Notifications from "./pages/Notifications";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
@@ -61,6 +62,11 @@ function App() {
         <Route path="/planning" element={
           <ProtectedRoute rolesAutorises={["MEDECIN"]}>
             <Planning />
+          </ProtectedRoute>
+        } />
+        <Route path="/notifications" element={
+          <ProtectedRoute rolesAutorises={["MEDECIN"]}>
+            <Notifications />
           </ProtectedRoute>
         } />
 

@@ -703,3 +703,29 @@
   font-family: inherit;
   text-align: left;
 }
+
+.nav-badge {
+  margin-left: auto;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--rouge);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.barre-mobile-bouton { position: relative; }
+.barre-mobile-pastille {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--rouge);
+  border: 2px solid #0d4bb0;
+}

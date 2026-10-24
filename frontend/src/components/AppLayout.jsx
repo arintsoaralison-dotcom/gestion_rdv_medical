@@ -4,8 +4,9 @@ import Sidebar from "./Sidebar";
 import APropos from "./APropos";
 import { useAuth } from "../context/AuthContext";
 import useBloquerRetour from "../hooks/useBloquerRetour";
+import useNotifications from "../hooks/useNotifications";
 
-
+// Page d'accueil de chaque rôle après connexion
 const ACCUEIL_PAR_ROLE = {
   PATIENT: "/medecins",
   MEDECIN: "/dashboard-medecin",
@@ -18,9 +19,13 @@ function AppLayout({ children }) {
   const [menuOuvert, setMenuOuvert] = useState(false);
   const [aProposOuvert, setAProposOuvert] = useState(false);
 
+  // Notifications : uniquement pour le médecin
+  const nonLues = useNotifications(user?.role === "MEDECIN");
 
+  // Retour bloqué uniquement sur la page d'accueil du rôle
   useBloquerRetour(pathname === ACCUEIL_PAR_ROLE[user?.role]);
 
+  // La touche Échap ferme le menu (utile sur tablette avec clavier)
   useEffect(() => {
     if (!menuOuvert) return;
     const surTouche = (e) => {
@@ -43,6 +48,7 @@ function AppLayout({ children }) {
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <path d="M4 6h16M4 12h16M4 18h16" />
           </svg>
+          {nonLues > 0 && <span className="barre-mobile-pastille" />}
         </button>
         <div className="nav-side-badge petit">RM</div>
         <p className="barre-mobile-titre">RDV Médical</p>
@@ -54,6 +60,7 @@ function AppLayout({ children }) {
         ouvert={menuOuvert}
         fermer={() => setMenuOuvert(false)}
         ouvrirAPropos={() => setAProposOuvert(true)}
+        nonLues={nonLues}
       />
       <div className="app-contenu">{children}</div>
 

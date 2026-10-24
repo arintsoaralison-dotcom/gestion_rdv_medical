@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import RendezVous
+from .models import RendezVous, Notification
 
 
 class RendezVousSerializer(serializers.ModelSerializer):
@@ -29,3 +29,10 @@ class RendezVousSerializer(serializers.ModelSerializer):
                     "Ce créneau est déjà réservé pour ce médecin. Choisis un autre horaire."
                 )
         return data
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = ['id', 'type', 'message', 'lue', 'date_creation', 'rendezvous']
+        read_only_fields = fields
